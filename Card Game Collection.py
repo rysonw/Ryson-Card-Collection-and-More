@@ -1,66 +1,156 @@
-
+from multiprocessing.connection import wait
 import random, pygame, os, sys
 from pygame.locals import *
 
-class Card(object):
+# ! ALWAYS define the main variables at the top
+
+WIDTH, HEIGHT = 1000, 1000  # Make constant variables CAPITAL
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Ryson's Card Game Collection!")
+pygame.init()
+
+baby_blue = (33, 171, 240)
+click = False
+FPS = 60
+
+# fonts
+font = pygame.font.SysFont("Sans", 20)
+main_font = pygame.font.Font("fonts/lm2.otf", 25)
+azonix = pygame.font.Font("fonts/Azonix.otf", 60)
+azonix_large = pygame.font.Font("fonts/Azonix.otf", 40)
+azonix_l = pygame.font.Font("fonts/Azonix.otf", 65)
+main_font_large = pygame.font.Font("fonts/lm2.otf", 100)
+
+# colors
+BLACK = (0, 0, 0)
+BROWN = (155, 155, 155)
+LIGHT_BROWN = (195, 155, 119)
+WHITE = (255, 255, 255)
+
+# images
+
+WAR = pygame.image.load("images/war_heading.png")
+MAIN_MENU = pygame.image.load("images/main_menu.png")
+
+green_deck = pygame.transform.scale(pygame.image.load("images/green_deck.png"), (100, 150))
+green_card = pygame.transform.scale(pygame.image.load("images/green_deck.png"), (100, 150))
+green_card_turning1 = pygame.transform.scale(pygame.image.load("images/green_card_turning1.png"), (100, 150))
+green_card_turning2 = pygame.transform.scale(pygame.image.load("images/green_card_turning2.png"), (100, 150))
+
+Heart_2 = pygame.transform.scale(pygame.image.load("images/hearts/2 of Hearts.png"), (100, 150))
+Heart_3 = pygame.transform.scale(pygame.image.load("images/hearts/3 of Hearts.png"), (100, 150))
+Heart_4 = pygame.transform.scale(pygame.image.load("images/hearts/4 of Hearts.png"), (100, 150))
+Heart_5 = pygame.transform.scale(pygame.image.load("images/hearts/5 of Hearts.png"), (100, 150))
+Heart_6 = pygame.transform.scale(pygame.image.load("images/hearts/6 of Hearts.png"), (100, 150))
+Heart_7 = pygame.transform.scale(pygame.image.load("images/hearts/7 of Hearts.png"), (100, 150))
+Heart_8 = pygame.transform.scale(pygame.image.load("images/hearts/8 of Hearts.png"), (100, 150))
+Heart_9 = pygame.transform.scale(pygame.image.load("images/hearts/9 of Hearts.png"), (100, 150))
+Heart_10 = pygame.transform.scale(pygame.image.load("images/hearts/10 of Hearts.png"), (100, 150))
+Heart_J = pygame.transform.scale(pygame.image.load("images/hearts/Jack of Hearts.png"), (100, 150))
+Heart_Q = pygame.transform.scale(pygame.image.load("images/hearts/Queen of Hearts.png"), (100, 150))
+Heart_K = pygame.transform.scale(pygame.image.load("images/hearts/King of Hearts.png"), (100, 150))
+Heart_A = pygame.transform.scale(pygame.image.load("images/hearts/Ace of Hearts.png"), (100, 150))
+
+Clubs_2 = pygame.transform.scale(pygame.image.load("images/clubs/2 of Clubs.png"), (100, 150))
+Clubs_3 = pygame.transform.scale(pygame.image.load("images/clubs/3 of Clubs.png"), (100, 150))
+Clubs_4 = pygame.transform.scale(pygame.image.load("images/clubs/4 of Clubs.png"), (100, 150))
+Clubs_5 = pygame.transform.scale(pygame.image.load("images/clubs/5 of Clubs.png"), (100, 150))
+Clubs_6 = pygame.transform.scale(pygame.image.load("images/clubs/6 of Clubs.png"), (100, 150))
+Clubs_7 = pygame.transform.scale(pygame.image.load("images/clubs/7 of Clubs.png"), (100, 150))
+Clubs_8 = pygame.transform.scale(pygame.image.load("images/clubs/8 of Clubs.png"), (100, 150))
+Clubs_9 = pygame.transform.scale(pygame.image.load("images/clubs/9 of Clubs.png"), (100, 150))
+Clubs_10 = pygame.transform.scale(pygame.image.load("images/clubs/10 of Clubs.png"), (100, 150))
+Clubs_J = pygame.transform.scale(pygame.image.load("images/clubs/Jack of Clubs.png"), (100, 150))
+Clubs_Q = pygame.transform.scale(pygame.image.load("images/clubs/Queen of Clubs.png"), (100, 150))
+Clubs_K = pygame.transform.scale(pygame.image.load("images/clubs/King of Clubs.png"), (100, 150))
+Clubs_A = pygame.transform.scale(pygame.image.load("images/clubs/Ace of Clubs.png"), (100, 150))
+
+Spades_2 = pygame.transform.scale(pygame.image.load("images/spades/2 of Spades.png"), (100, 150))
+Spades_3 = pygame.transform.scale(pygame.image.load("images/spades/3 of Spades.png"), (100, 150))
+Spades_4 = pygame.transform.scale(pygame.image.load("images/spades/4 of Spades.png"), (100, 150))
+Spades_5 = pygame.transform.scale(pygame.image.load("images/spades/5 of Spades.png"), (100, 150))
+Spades_6 = pygame.transform.scale(pygame.image.load("images/spades/6 of Spades.png"), (100, 150))
+Spades_7 = pygame.transform.scale(pygame.image.load("images/spades/7 of Spades.png"), (100, 150))
+Spades_8 = pygame.transform.scale(pygame.image.load("images/spades/8 of Spades.png"), (100, 150))
+Spades_9 = pygame.transform.scale(pygame.image.load("images/spades/9 of Spades.png"), (100, 150))
+Spades_10 = pygame.transform.scale(pygame.image.load("images/spades/10 of Spades.png"), (100, 150))
+Spades_J = pygame.transform.scale(pygame.image.load("images/spades/Jack of Spades.png"), (100, 150))
+Spades_Q = pygame.transform.scale(pygame.image.load("images/spades/Queen of Spades.png"), (100, 150))
+Spades_K = pygame.transform.scale(pygame.image.load("images/spades/King of Spades.png"), (100, 150))
+Spades_A = pygame.transform.scale(pygame.image.load("images/spades/Ace of Spades.png"), (100, 150))
+
+Diamonds_2 = pygame.transform.scale(pygame.image.load("images/diamonds/2 of Diamonds.png"), (100, 150))
+Diamonds_3 = pygame.transform.scale(pygame.image.load("images/diamonds/3 of Diamonds.png"), (100, 150))
+Diamonds_4 = pygame.transform.scale(pygame.image.load("images/diamonds/4 of Diamonds.png"), (100, 150))
+Diamonds_5 = pygame.transform.scale(pygame.image.load("images/diamonds/5 of Diamonds.png"), (100, 150))
+Diamonds_6 = pygame.transform.scale(pygame.image.load("images/diamonds/6 of Diamonds.png"), (100, 150))
+Diamonds_7 = pygame.transform.scale(pygame.image.load("images/diamonds/7 of Diamonds.png"), (100, 150))
+Diamonds_8 = pygame.transform.scale(pygame.image.load("images/diamonds/8 of Diamonds.png"), (100, 150))
+Diamonds_9 = pygame.transform.scale(pygame.image.load("images/diamonds/9 of Diamonds.png"), (100, 150))
+Diamonds_10 = pygame.transform.scale(pygame.image.load("images/diamonds/10 of Diamonds.png"), (100, 150))
+Diamonds_J = pygame.transform.scale(pygame.image.load("images/diamonds/Jack of Diamonds.png"), (100, 150))
+Diamonds_Q = pygame.transform.scale(pygame.image.load("images/diamonds/Queen of Diamonds.png"), (100, 150))
+Diamonds_K = pygame.transform.scale(pygame.image.load("images/diamonds/King of Diamonds.png"), (100, 150))
+Diamonds_A = pygame.transform.scale(pygame.image.load("images/diamonds/Ace of Diamonds.png"), (100, 150))
+
+
+# classes
+class Card:
     def __init__(self, number, suit, value):
         self.suit = suit
         self.number = number
         self.value = value
 
-    
-    def show(self):
-        print("{} of {}".format(self.number, self.suit))
-    
-    
     def card_value(self):
         return self.value
 
-    
-    
-class emptyDeck(object):
+    def animate(direction):
+        pass
+
+
+class emptyDeck:
     def __init__(self):
         self.cards = []
 
-    
     def showDeck(self):
         for c in self.cards:
             c.show()
-
 
     def shuffle(self):
         for i in range(len(self.cards) - 1, 0, -1):
             r = random.randint(0, i)
             self.cards[i], self.cards[r] = self.cards[r], self.cards[i]
 
-    
     def drawCard(self):
         return self.cards.pop()
 
-    
+    # ! added drawDeck to draw whole deck
+    def drawDeck(self, deck):
+        for card in self.cards:
+            deck.append(card)
+
+        self.cards.clear()
+
     def addCard(self, player):
         self.cards.append(player.playCard())
 
 
-
-
-class Deck(object):
+class Deck:
     def __init__(self):
         self.cards = []
         self.build()
-    
+
     def showDeck(self):
         for c in self.cards(1):
             c.show()
-
 
     def emptyDeck(self):
         for i in self.cards:
             self.cards.pop()
 
     def build(self):
-        for suit in ["♥", "♠️", "♣️", "♦️"]:
-            for v in range(1, 14):
+        for suit in ["heart", "spade", "club", "diamond"]:
+            for v in range(2, 15):
                 if v == 11:
                     self.cards.append(Card("Jack", suit, v))
                 elif v == 12:
@@ -69,8 +159,6 @@ class Deck(object):
                     self.cards.append(Card("King", suit, v))
                 elif v == 14:
                     self.cards.append(Card("Ace", suit, v))
-                elif v == 1:
-                    pass
                 else:
                     self.cards.append(Card(v, suit, v))
 
@@ -79,12 +167,11 @@ class Deck(object):
             r = random.randint(0, i)
             self.cards[i], self.cards[r] = self.cards[r], self.cards[i]
 
-    
     def drawCard(self):
         return self.cards.pop()
 
 
-class Player(object): #Create different types of players for each game
+class Player(object):  # Create different types of players for each game
     def __init__(self):
         self.hand = []
 
@@ -113,69 +200,35 @@ class Player(object): #Create different types of players for each game
     def cardSuit(self):
         for c in self.hand:
             return c.suit
-    
 
     # def war_play_card(self):
     #     x = self.hand.pop()
     #     return x.value
-        
 
 
-Heart_2 = pygame.image.load(os.path.join("Hearts", "2 of Hearts.png"))
-Heart_3 = pygame.image.load(os.path.join("Hearts", "3 of Hearts.png"))
-Heart_4 = pygame.image.load(os.path.join("Hearts", "4 of Hearts.png"))
-Heart_5 = pygame.image.load(os.path.join("Hearts", "5 of Hearts.png"))
-Heart_6 = pygame.image.load(os.path.join("Hearts", "6 of Hearts.png"))
-Heart_7 = pygame.image.load(os.path.join("Hearts", "7 of Hearts.png"))
-Heart_8 = pygame.image.load(os.path.join("Hearts", "8 of Hearts.png"))
-Heart_9 = pygame.image.load(os.path.join("Hearts", "9 of Hearts.png"))
-Heart_10 = pygame.image.load(os.path.join("Hearts", "10 of Hearts.png"))
-Heart_J = pygame.image.load(os.path.join("Hearts", "Jack of Hearts.png"))
-Heart_Q = pygame.image.load(os.path.join("Hearts", "Queen of Hearts.png"))
-Heart_K = pygame.image.load(os.path.join("Hearts", "King of Hearts.png"))
-Heart_A = pygame.image.load(os.path.join("Hearts", "Ace of Hearts.png"))
+# ! added new class for WarGame
+class WarGame:
+    def __init__(self, player1, player2):
+        self.p1 = player1
+        self.p2 = player2
 
-Clubs_2 = pygame.image.load(os.path.join("Clubs", "2 of Clubs.png"))
-Clubs_3 = pygame.image.load(os.path.join("Clubs", "3 of Clubs.png"))
-Clubs_4 = pygame.image.load(os.path.join("Clubs", "4 of Clubs.png"))
-Clubs_5 = pygame.image.load(os.path.join("Clubs", "5 of Clubs.png"))
-Clubs_6 = pygame.image.load(os.path.join("Clubs", "6 of Clubs.png"))
-Clubs_7 = pygame.image.load(os.path.join("Clubs", "7 of Clubs.png"))
-Clubs_8 = pygame.image.load(os.path.join("Clubs", "8 of Clubs.png"))
-Clubs_9 = pygame.image.load(os.path.join("Clubs", "9 of Clubs.png"))
-Clubs_10 = pygame.image.load(os.path.join("Clubs", "10 of Clubs.png"))
-Clubs_J = pygame.image.load(os.path.join("Clubs", "Jack of Clubs.png"))
-Clubs_Q = pygame.image.load(os.path.join("Clubs", "Queen of Clubs.png"))
-Clubs_K = pygame.image.load(os.path.join("Clubs", "King of Clubs.png"))
-Clubs_A = pygame.image.load(os.path.join("Clubs", "Ace of Clubs.png"))
+    # ! checking for winner
+    def winner(self, p1, cpu, deck):
+        if len(p1.hand) == 0 and len(deck) == 0:
+            return cpu
+        elif len(cpu.hand) == 0 and len(deck) == 0:
+            return p1
 
-Spades_2 = pygame.image.load(os.path.join("Spades", "2 of Spades.png"))
-Spades_3 = pygame.image.load(os.path.join("Spades", "3 of Spades.png"))
-Spades_4 = pygame.image.load(os.path.join("Spades", "4 of Spades.png"))
-Spades_5 = pygame.image.load(os.path.join("Spades", "5 of Spades.png"))
-Spades_6 = pygame.image.load(os.path.join("Spades", "6 of Spades.png"))
-Spades_7 = pygame.image.load(os.path.join("Spades", "7 of Spades.png"))
-Spades_8 = pygame.image.load(os.path.join("Spades", "8 of Spades.png"))
-Spades_9 = pygame.image.load(os.path.join("Spades", "9 of Spades.png"))
-Spades_10 = pygame.image.load(os.path.join("Spades", "10 of Spades.png"))
-Spades_J = pygame.image.load(os.path.join("Spades", "Jack of Spades.png"))
-Spades_Q = pygame.image.load(os.path.join("Spades", "Queen of Spades.png"))
-Spades_K = pygame.image.load(os.path.join("Spades", "King of Spades.png"))
-Spades_A = pygame.image.load(os.path.join("Spades", "Ace of Spades.png"))
+        return None
 
-Diamonds_2 = pygame.image.load(os.path.join("Diamonds", "2 of Diamonds.png"))
-Diamonds_3 = pygame.image.load(os.path.join("Diamonds", "3 of Diamonds.png"))
-Diamonds_4 = pygame.image.load(os.path.join("Diamonds", "4 of Diamonds.png"))
-Diamonds_5 = pygame.image.load(os.path.join("Diamonds", "5 of Diamonds.png"))
-Diamonds_6 = pygame.image.load(os.path.join("Diamonds", "6 of Diamonds.png"))
-Diamonds_7 = pygame.image.load(os.path.join("Diamonds", "7 of Diamonds.png"))
-Diamonds_8 = pygame.image.load(os.path.join("Diamonds", "8 of Diamonds.png"))
-Diamonds_9 = pygame.image.load(os.path.join("Diamonds", "9 of Diamonds.png"))
-Diamonds_10 = pygame.image.load(os.path.join("Diamonds", "10 of Diamonds.png"))
-Diamonds_J = pygame.image.load(os.path.join("Diamonds", "Jack of Diamonds.png"))
-Diamonds_Q = pygame.image.load(os.path.join("Diamonds", "Queen of Diamonds.png"))
-Diamonds_K = pygame.image.load(os.path.join("Diamonds", "King of Diamonds.png"))
-Diamonds_A = pygame.image.load(os.path.join("Diamonds", "Ace of Diamonds.png"))
+    # ! comparing cards for direction
+    def compare_cards(self, value1, value2):
+        if value1 > value2:
+            return True
+        elif value1 < value2:
+            return False
+
+        return "war"
 
 
 # deck = Deck()
@@ -189,23 +242,390 @@ Diamonds_A = pygame.image.load(os.path.join("Diamonds", "Ace of Diamonds.png"))
 # player.showHand()
 
 
-WIDTH, HEIGHT = 1000, 1000 #Make constant variables CAPITAL
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Ryson's Card Game Collection!")
-pygame.init()
+def war():
+    running = True
+    clock = pygame.time.Clock()
+    p1 = Player()
+    cpu = Player()
+    game = WarGame(p1, cpu)
+    FPS = 144
 
-baby_blue = (33, 171, 240)
-click = False
-FPS = 144
-font = pygame.font.SysFont(None, 20)
+    war_deck = Deck()  # Main deck
+    war_deck.build()
+    war_deck.shuffle()
+
+    play_deck = emptyDeck()  # Deck to be used as a "cache", all cards will then be added to the winning player's deck
+
+    for i in range(26):  # Deals out cards to the players
+        p1.hand.append(war_deck.drawCard())
+        cpu.hand.append(war_deck.drawCard())
+
+    value_played = []
+    suit_played = []
+
+    # text, img, coor
+
+    card = green_card
+
+    p1_cards_left = main_font.render(str(len(p1.hand)) + " left ", False, BLACK)
+    cpu_cards_left = main_font.render(str(len(cpu.hand)) + " left ", False, BLACK)
+    war_text = azonix_large.render("WAR", False, BLACK)
+    p1_deck_rect = pygame.Rect(WIDTH / 2 - green_deck.get_width() / 2, HEIGHT - green_deck.get_height() * 1.5,
+                               green_deck.get_width(), green_deck.get_height())
+    cpu_deck_rect = pygame.Rect(WIDTH / 2 - green_deck.get_width() / 2, green_deck.get_height() * 0.5,
+                                green_deck.get_width(), green_deck.get_height())
+
+    current_card = green_card
+    current_card2 = green_card
+
+    # ! animation variables for coordinates and card moving animations
+
+    p1_card_x, p1_card_y = (p1_deck_rect.x, p1_deck_rect.y)
+    cpu_card_x, cpu_card_y = (cpu_deck_rect.x, cpu_deck_rect.y)
+
+    p1_war_card_x, p1_war_card_y = (p1_deck_rect.x, p1_deck_rect.y)
+    p1_war_card_x2, p1_war_card_y2 = (p1_deck_rect.x, p1_deck_rect.y)
+    p1_war_card_x3, p1_war_card_y3 = (p1_deck_rect.x, p1_deck_rect.y)
+
+    cpu_war_card_x, cpu_war_card_y = (cpu_deck_rect.x, cpu_deck_rect.y)
+    cpu_war_card_x2, cpu_war_card_y2 = (cpu_deck_rect.x, cpu_deck_rect.y)
+    cpu_war_card_x3, cpu_war_card_y3 = (cpu_deck_rect.x, cpu_deck_rect.y)
+
+    # ! animation variables: animations in pygame get messy
+
+    p1_move_card = False
+    cpu_move_card = False
+    move_back = False
+    direction = True
+    moving = False
+    finished_war_animation = False
+    winner = None
+
+    # counters
+    wait_time = 0
+    wait_time_war = 0
+
+    def redraw_window():
+        # ! drawing the window
+
+        WIN.fill(BROWN)
+
+        WIN.blit(WAR, (0, 0))
+        WIN.blit(green_deck, (p1_deck_rect.x, p1_deck_rect.y))
+        WIN.blit(green_deck, (cpu_deck_rect.x, cpu_deck_rect.y))
+        WIN.blit(current_card, (p1_card_x, p1_card_y))
+        WIN.blit(current_card2, (cpu_card_x, cpu_card_y))
+
+        WIN.blit(current_card, (p1_card_x, p1_card_y))
+        WIN.blit(current_card, (cpu_card_x, cpu_card_y))
+
+        WIN.blit(green_card, (p1_war_card_x, p1_war_card_y))
+        WIN.blit(green_card, (cpu_war_card_x, cpu_war_card_y))
+        WIN.blit(green_card, (p1_war_card_x2, p1_war_card_y2))
+        WIN.blit(green_card, (cpu_war_card_x2, cpu_war_card_y2))
+        WIN.blit(green_card, (p1_war_card_x3, p1_war_card_y3))
+        WIN.blit(green_card, (cpu_war_card_x3, cpu_war_card_y3))
+
+        # ! checking a few things to blit over when animating, socards have been layed on top, coming from top, etc.
+
+        if direction != "war":
+            WIN.blit(current_card, (p1_card_x, p1_card_y))
+            WIN.blit(current_card, (cpu_card_x, cpu_card_y))
+            WIN.blit(current_card, (p1_card_x, p1_card_y))
+            WIN.blit(current_card2, (cpu_card_x, cpu_card_y))
+
+        if move_back:
+            WIN.blit(green_deck, (p1_deck_rect.x, p1_deck_rect.y))
+            WIN.blit(green_deck, (cpu_deck_rect.x, cpu_deck_rect.y))
+
+        if wait_time >= 1 and wait_time <= FPS:
+            if direction == "war":
+                WIN.blit(war_text, (WIDTH / 2 - war_text.get_width() / 2, HEIGHT / 2 - war_text.get_height() / 2))
+
+        # ! cards left
+
+        WIN.blit(p1_cards_left, (p1_deck_rect.x + p1_deck_rect.width * 1.25,
+                                 p1_deck_rect.y + p1_deck_rect.height / 2 - p1_cards_left.get_height() / 2))
+        WIN.blit(cpu_cards_left, (cpu_deck_rect.x + cpu_deck_rect.width * 1.25,
+                                  cpu_deck_rect.y + cpu_deck_rect.height / 2 - cpu_cards_left.get_height() / 2))
+
+        pygame.display.update()
+
+    while running:  # Is this needed? #! yes it is, this is the main loop, without it the game wont work
+        clock.tick(FPS)
+
+        # ! updating the cards left variables
+        p1_cards_left = main_font.render(str(len(p1.hand)) + " left ", False, BLACK)
+        cpu_cards_left = main_font.render(str(len(cpu.hand)) + " left ", False, BLACK)
+
+        # ! checking for winner
+        if game.winner(p1, cpu, value_played):
+            if game.winner(p1, cpu, value_played) == p1:
+                winner = "you"
+                restart_menu(winner)
+            else:
+                winner = "cpu"
+                restart_menu(winner)
+
+        # ! checking for events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                # ! if clicked
+                m = pygame.mouse.get_pos()
+                # ! if player clicked on his deck
+                if p1_deck_rect.collidepoint(m):
+                    # ! if not in animation or winner
+                    if not moving and not winner:
+                        # ! appending values, etc.
+                        moving = True
+
+                        value_played.append(p1.cardValue())
+                        suit_played.append(p1.cardSuit())
+                        play_deck.addCard(p1)
+                        p1_move_card = True
+
+                        value_played.append(cpu.cardValue())
+                        suit_played.append(cpu.cardSuit())
+                        play_deck.addCard(cpu)
+
+                        cpu_move_card = True
+
+                        # ! getting direction
+                        direction = game.compare_cards(value_played[0], value_played[1])
+
+        # !
+        # ! The animations in pygame can get messy. You can put everything in functions and classes if you want and the main loop of the game will look better
+        # ! I have not done that because it will get event more confusing because you will have to give many unclear parameters to the functions and then work with them in the classes
+        # !
+
+        # ! starting moving the cards (for animation)
+
+        if p1_move_card:
+            if p1_card_y > HEIGHT / 2 - p1_deck_rect.height / 2 or p1_card_x > p1_deck_rect.x - p1_deck_rect.width / 2:
+                p1_card_y -= 9
+                p1_card_x -= 2.75
+            else:
+                p1_move_card = False
+                # ! showing image when at place
+                img = show_card_image(suit_played[0], value_played[0])
+                current_card = img
+
+                p1_war_card_x, p1_war_card_y = p1_war_card_x2, p1_war_card_y2 = p1_war_card_x3, p1_war_card_y3 = (
+                p1_deck_rect.x, p1_deck_rect.y)
+
+        if cpu_move_card:
+            if cpu_card_y < HEIGHT / 2 - cpu_deck_rect.height / 2 or cpu_card_x < cpu_deck_rect.x + cpu_deck_rect.width / 2:
+                cpu_card_y += 9
+                cpu_card_x += 2.75
+            else:
+                cpu_move_card = False
+                img = show_card_image(suit_played[1], value_played[1])
+                current_card2 = img
+                wait_time = 1
+
+                cpu_war_card_x, cpu_war_card_y = cpu_war_card_x2, cpu_war_card_y2 = cpu_war_card_x3, cpu_war_card_y3 = (
+                cpu_deck_rect.x, cpu_deck_rect.y)
+
+        # ! waiting a bit when card layed (1 sec)
+        if wait_time >= 1:
+            if wait_time < FPS:  # ! change wait time here if you want
+                wait_time += 1
+            else:
+                wait_time = 0
+                move_back = True
+
+                if direction == "war":
+                    wait_time_war = 1
+
+        # ! moving cards back
+        if move_back:
+            done = True
+
+            if direction == True:
+                if p1_card_x < p1_deck_rect.x:
+                    p1_card_x += 5
+                    done = False
+                if p1_card_y < p1_deck_rect.y:
+                    p1_card_y += 10
+                    done = False
+                if cpu_card_x > p1_deck_rect.x:
+                    cpu_card_x -= 5
+                    done = False
+                if cpu_card_y < p1_deck_rect.y:
+                    cpu_card_y += 10
+                    done = False
+
+                if done:
+                    # ! when completely moved back, reset variables, allow to move again and append won cards
+                    move_back = False
+                    moving = False
+                    p1_card_x, p1_card_y = (p1_deck_rect.x, p1_deck_rect.y)
+                    cpu_card_x, cpu_card_y = (cpu_deck_rect.x, cpu_deck_rect.y)
+                    value_played.clear()
+                    suit_played.clear()
+                    play_deck.drawDeck(p1.hand)
+
+                current_card = green_card
+                current_card2 = green_card
+
+            elif direction == False:
+                if p1_card_x < cpu_deck_rect.x:
+                    p1_card_x += 5
+                    done = False
+                if p1_card_y > cpu_deck_rect.y:
+                    p1_card_y -= 10
+                    done = False
+                if cpu_card_x > cpu_deck_rect.x:
+                    cpu_card_x -= 5
+                    done = False
+                if cpu_card_y > cpu_deck_rect.y:
+                    cpu_card_y -= 10
+                    done = False
+
+                if done:
+                    move_back = False
+                    moving = False
+                    p1_card_x, p1_card_y = (p1_deck_rect.x, p1_deck_rect.y)
+                    cpu_card_x, cpu_card_y = (cpu_deck_rect.x, cpu_deck_rect.y)
+                    value_played.clear()
+                    suit_played.clear()
+                    print("clear")
+                    play_deck.drawDeck(cpu.hand)
+
+                current_card = green_card
+                current_card2 = green_card
 
 
+            # ! war
+            elif direction == "war":
 
-def draw_main_menu(): #Multiple draw functions for each game
-    WIN.fill(baby_blue)
-    # WIN.blit(Spades_A, (100, 950))
-    WIN.blit((show_card_image("♠️", 14)), (100, 950))
-    pygame.display.update()
+                # ! move 3 cards and append cards to list
+                if wait_time_war >= 1 and wait_time_war < FPS / 2:
+                    if wait_time_war == 1:
+                        play_deck.addCard(p1)
+                        play_deck.addCard(cpu)
+
+                    if p1_war_card_y > HEIGHT / 2 - p1_deck_rect.height / 2 or p1_war_card_x > p1_deck_rect.x - p1_deck_rect.width / 2:
+                        p1_war_card_y -= 9
+                        p1_war_card_x -= 2.75
+                    if cpu_war_card_y < HEIGHT / 2 - cpu_deck_rect.height / 2 or cpu_war_card_x < cpu_deck_rect.x + cpu_deck_rect.width / 2:
+                        cpu_war_card_y += 9
+                        cpu_war_card_x += 2.75
+
+                elif wait_time_war >= FPS / 2 and wait_time_war < FPS:
+                    if wait_time_war == FPS / 2:
+                        play_deck.addCard(p1)
+                        play_deck.addCard(cpu)
+
+                    if p1_war_card_y2 > HEIGHT / 2 - p1_deck_rect.height / 2 or p1_war_card_x2 > p1_deck_rect.x - p1_deck_rect.width / 2:
+                        p1_war_card_y2 -= 9
+                        p1_war_card_x2 -= 2.75
+
+                    if cpu_war_card_y2 < HEIGHT / 2 - cpu_deck_rect.height / 2 or cpu_war_card_x2 < cpu_deck_rect.x + cpu_deck_rect.width / 2:
+                        cpu_war_card_y2 += 9
+                        cpu_war_card_x2 += 2.75
+
+                elif wait_time_war >= FPS and wait_time_war < FPS * 1.5:
+                    if wait_time_war == FPS:
+                        play_deck.addCard(p1)
+                        play_deck.addCard(cpu)
+
+                    if p1_war_card_y3 > HEIGHT / 2 - p1_deck_rect.height / 2 or p1_war_card_x3 > p1_deck_rect.x - p1_deck_rect.width / 2:
+                        p1_war_card_y3 -= 9
+                        p1_war_card_x3 -= 2.75
+
+                    if cpu_war_card_y3 < HEIGHT / 2 - cpu_deck_rect.height / 2 or cpu_war_card_x3 < cpu_deck_rect.x + cpu_deck_rect.width / 2:
+                        cpu_war_card_y3 += 9
+                        cpu_war_card_x3 += 2.75
+
+                # ! resetting variables ans allowing moving again. Then moving normally again and earning all war cards if won
+                elif wait_time_war > FPS * 1.5:
+                    wait_time_war = 0
+                    moving = False
+                    move_back = False
+                    current_card = current_card2 = green_card
+                    p1_card_x, p1_card_y = (p1_deck_rect.x, p1_deck_rect.y)
+                    cpu_card_x, cpu_card_y = (cpu_deck_rect.x, cpu_deck_rect.y)
+                    value_played.clear()
+                    suit_played.clear()
+                    print("cleared")
+
+                if wait_time_war >= 1:
+                    wait_time_war += 1
+
+        redraw_window()
+
+        pygame.display.update()
+
+
+# ! restart menu
+def restart_menu(winner):
+    clock = pygame.time.Clock()
+    FPS = 60
+    run = True
+
+    # ! text and rect var
+    if winner == "you":
+        won = main_font_large.render("YOU WON", False, WHITE)
+    else:
+        won = main_font_large.render("YOU LOST", False, WHITE)
+
+    restart = main_font.render("RESTART GAME", False, WHITE)
+    back = main_font.render("MAIN MENU", False, WHITE)
+    leave = main_font.render("QUIT", False, WHITE)
+
+    leave_rect = pygame.Rect(WIDTH / 2 - 125 - 300, HEIGHT / 2 + 100, 250, 50)
+    back_rect = pygame.Rect(WIDTH / 2 - 125, HEIGHT / 2 + 100, 250, 50)
+    restart_rect = pygame.Rect(WIDTH / 2 + 125 + 50, HEIGHT / 2 + 100, 250, 50)
+
+    def redraw_window():
+        # ! drawing
+
+        WIN.blit(won, (WIDTH / 2 - won.get_width() / 2, HEIGHT / 2 - won.get_height()))
+
+        pygame.draw.rect(WIN, (255, 0, 0), leave_rect, 5)
+        pygame.draw.rect(WIN, (120, 0, 0), leave_rect)
+
+        pygame.draw.rect(WIN, (100, 100, 100), back_rect, 5)
+        pygame.draw.rect(WIN, (20, 20, 20), back_rect)
+
+        pygame.draw.rect(WIN, (0, 255, 0), restart_rect, 5)
+        pygame.draw.rect(WIN, (0, 100, 0), restart_rect)
+
+        WIN.blit(leave, (leave_rect.x + leave_rect.width / 2 - leave.get_width() / 2,
+                         leave_rect.y + leave_rect.height / 2 - leave.get_height() / 2))
+        WIN.blit(back, (back_rect.x + back_rect.width / 2 - back.get_width() / 2,
+                        back_rect.y + back_rect.height / 2 - back.get_height() / 2))
+        WIN.blit(restart, (restart_rect.x + restart_rect.width / 2 - restart.get_width() / 2,
+                           restart_rect.y + restart_rect.height / 2 - restart.get_height() / 2))
+
+        pygame.display.update()
+
+    while run:
+        clock.tick(FPS)
+
+        # ! checking for clicking
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == MOUSEBUTTONDOWN:
+                m = pygame.mouse.get_pos()
+
+                if leave_rect.collidepoint(m):
+                    pygame.quit()
+                    sys.exit()
+                if back_rect.collidepoint(m):
+                    main_menu()
+                if restart_rect.collidepoint(m):
+                    return war()
+
+        redraw_window()
+
 
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, 1, color)
@@ -215,232 +635,170 @@ def draw_text(text, font, color, surface, x, y):
 
 
 def main_menu():
-    mainClock = pygame.time.Clock()
-    while True:
+    clock = pygame.time.Clock()
+    FPS = 60
+    run = True
+
+    # ! to calculate the right pos, all the text variables have to be defined normally, not with "draw_text"
+
+    # heading = azonix_large.render("Ryson's Card Game Collection", False, WHITE)
+
+    play = azonix.render("Play", False, WHITE)
+    options = azonix.render("Options", False, WHITE)
+    about = azonix.render("About", False, WHITE)
+    help = azonix.render("Help", False, WHITE)
+
+    # ! variables that need to be defined for hover animation
+
+    play_rect = pygame.Rect(WIDTH / 2 - play.get_width() / 2 - 10, HEIGHT / 2 - 200 - 4, play.get_width() + 20,
+                            play.get_height() - 4)
+    options_rect = pygame.Rect(WIDTH / 2 - options.get_width() / 2 - 10, HEIGHT / 2 - 50 - 4, options.get_width() + 20,
+                               options.get_height() - 4)
+    about_rect = pygame.Rect(WIDTH / 2 - about.get_width() / 2 - 10, HEIGHT / 2 + 50 + about.get_height() - 4,
+                             about.get_width() + 20, about.get_height() - 4)
+    help_rect = pygame.Rect(WIDTH / 2 - help.get_width() / 2 - 10, HEIGHT / 2 + 200 + help.get_height() - 4,
+                            help.get_width() + 20, help.get_height() - 4)
+
+    def draw_main_menu():
+        WIN.fill((24, 24, 24))
+        WIN.blit(MAIN_MENU, (0, 0))
+        # WIN.blit(heading, (WIDTH / 2 - heading.get_width() / 2, 200))
+
+        # ! hover animation
+        m = pygame.mouse.get_pos()
+        if play_rect.collidepoint(m):
+            pygame.draw.rect(WIN, (80, 80, 80), play_rect, 2)
+        elif options_rect.collidepoint(m):
+            pygame.draw.rect(WIN, (80, 80, 80), options_rect, 2)
+        elif about_rect.collidepoint(m):
+            pygame.draw.rect(WIN, (80, 80, 80), about_rect, 2)
+        elif help_rect.collidepoint(m):
+            pygame.draw.rect(WIN, (80, 80, 80), help_rect, 2)
+
+        WIN.blit(play, (WIDTH / 2 - play.get_width() / 2, HEIGHT / 2 - 200))
+        WIN.blit(options, (WIDTH / 2 - options.get_width() / 2, HEIGHT / 2 - 50))
+        WIN.blit(about, (WIDTH / 2 - about.get_width() / 2, HEIGHT / 2 + 50 + about.get_height()))
+        WIN.blit(help, (WIDTH / 2 - help.get_width() / 2, HEIGHT / 2 + 200 + help.get_height()))
+
+        pygame.display.update()
+
+    while run:
+        clock.tick(FPS)
         draw_main_menu()
-        draw_text("Ryson's Card Game Collection", font, (255, 255, 255), WIN, 400, 60)
 
-        mx, my = pygame.mouse.get_pos()
-
-        button_1 = pygame.Rect(50, 100, 200, 50)
-        button_2 = pygame.Rect(50, 100, 200, 50)
-        button_3 = pygame.Rect(50, 100, 200, 50)
-        button_4 = pygame.Rect(50, 100, 200, 50)
-
-        if button_1.collidepoint((mx, my)): #if you hover cursor over button, button should change color
-            if click:
-                war()
-
-        if button_2.collidepoint((mx, my)): #if you hover cursor over button, button should change color
-            if click:
-                pass
-                #blackjack()
-
-        if button_3.collidepoint((mx, my)): #if you hover cursor over button, button should change color
-            if click:
-                pass
-                #go_fish()
-
-        if button_4.collidepoint((mx, my)): #if you hover cursor over button, button should change color
-            if click:
-                pass
-                #RPS()
-        
-                
-        pygame.draw.rect(WIN, (255, 0, 0), button_1)
-        draw_text("WAR", font, (255, 255, 255), WIN, 100, 100)
-
-
-        click = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    click = True
 
+            if event.type == MOUSEBUTTONDOWN:
+                # ! have not put hover animation with check clicked in one block
+                m = pygame.mouse.get_pos()
+                if play_rect.collidepoint(m):
+                    return play_menu()  # TODO: go to play options
+                elif options_rect.collidepoint(m):
+                    pass  # TODO: go to options
+                elif about_rect.collidepoint(m):
+                    pass  # TODO: go to about
+                elif help_rect.collidepoint(m):
+                    pass  # TODO: go to help
+
+
+def play_menu():
+    clock = pygame.time.Clock()
+    FPS = 60
+    run = True
+
+    heading = azonix_l.render("Ryson's", False, WHITE)
+    under_heading = azonix_l.render("Card Game Collection", False, WHITE)
+
+    war_text = azonix_large.render("WAR", False, WHITE)
+    blackjack = azonix_large.render("BLACKJACK", False, WHITE)
+    go_fish = azonix_large.render("GO FISH", False, WHITE)
+    rps = azonix_large.render("RPS", False, WHITE)
+
+    # ! variables that need to be defined for hover animation
+
+    war_text_rect = pygame.Rect(WIDTH * 0.25 - war_text.get_width() / 2 - 10, HEIGHT / 2 - 50 - 4,
+                                war_text.get_width() + 20, war_text.get_height())
+    blackjack_rect = pygame.Rect(WIDTH * 0.75 - blackjack.get_width() / 2 - 10, HEIGHT / 2 - 50 - 4,
+                                 blackjack.get_width() + 20, blackjack.get_height())
+    go_fish_rect = pygame.Rect(WIDTH * 0.25 - go_fish.get_width() / 2 - 10, HEIGHT / 2 + 200 + go_fish.get_height() - 4,
+                               go_fish.get_width() + 20, go_fish.get_height())
+    rps_rect = pygame.Rect(WIDTH * 0.75 - rps.get_width() / 2 - 10, HEIGHT / 2 + 200 + rps.get_height() - 4,
+                           rps.get_width() + 20, rps.get_height())
+
+    def draw_play_menu():
+        WIN.fill((24, 24, 24))
+        WIN.blit(heading, (WIDTH / 2 - heading.get_width() / 2, 100))
+        WIN.blit(under_heading, (WIDTH / 2 - under_heading.get_width() / 2, 170))
+
+        # ! hover animation
+        m = pygame.mouse.get_pos()
+        if war_text_rect.collidepoint(m):
+            pygame.draw.rect(WIN, (80, 80, 80), war_text_rect, 2)
+        elif blackjack_rect.collidepoint(m):
+            pygame.draw.rect(WIN, (80, 80, 80), blackjack_rect, 2)
+        elif go_fish_rect.collidepoint(m):
+            pygame.draw.rect(WIN, (80, 80, 80), go_fish_rect, 2)
+        elif rps_rect.collidepoint(m):
+            pygame.draw.rect(WIN, (80, 80, 80), rps_rect, 2)
+
+        WIN.blit(war_text, (WIDTH * 0.25 - war_text.get_width() / 2, HEIGHT / 2 - 50))
+        WIN.blit(blackjack, (WIDTH * 0.75 - blackjack.get_width() / 2, HEIGHT / 2 - 50))
+        WIN.blit(go_fish, (WIDTH * 0.25 - go_fish.get_width() / 2, HEIGHT / 2 + 200 + go_fish.get_height()))
+        WIN.blit(rps, (WIDTH * 0.75 - rps.get_width() / 2, HEIGHT / 2 + 200 + rps.get_height()))
 
         pygame.display.update()
-        mainClock.tick(60)
-        
 
-if __name__ == "__main__":
-    main_menu()
+    while run:
+        clock.tick(FPS)
+        draw_play_menu()
 
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
 
-def war():
-    running = True
-    p1 = Player() #Player
-
-    war_deck = Deck() #Main deck
-    war_deck.build()
-    war_deck.shuffle()
-    
-    play_deck = emptyDeck() #Deck to be used as a "cache", all cards will then be added to the winning player's deck
-
-
-    cpu = Player()
-    for i in range(26): #Deals out cards to the players
-        p1.hand.append(war_deck.drawCard())
-        cpu.hand.append(war_deck.drawCard())
-        
-
-    # if n == 1: #Need to figure out best way to implement multiple players
-    #     cpu1 = Player()
-    #     for i in range(26): #Deals out cards to the players
-    #         p1.hand.append(deck.drawCard())
-    #         cpu1.hand.append(deck.drawCard())
-        
-
-    # elif n == 2:
-    #     cpu1 = Player()
-    #     cpu2 = Player()
-    #     for i in range(17):
-    #         p1.hand.append(deck.drawCard())
-    #         cpu1.hand.append(deck.drawCard())
-    #         cpu2.hand.append(deck.drawCard())
-        
-    #     p1.hand.append(deck.drawCard())
-
-    # elif n == 3:
-    #     cpu1 = Player()
-    #     cpu2 = Player()
-    #     cpu3 = Player()
-    #     for i in range(13): 
-    #         p1.hand.append(deck.drawCard())
-    #         cpu1.hand.append(deck.drawCard())
-    #         cpu2.hand.append(deck.drawCard())
-    #         cpu3.hand.append(deck.drawCard())
+            if event.type == MOUSEBUTTONDOWN:
+                # ! have not put hover animation with check clicked in one block
+                m = pygame.mouse.get_pos()
+                if war_text_rect.collidepoint(m):
+                    return war()  # TODO: go to play options
+                elif blackjack_rect.collidepoint(m):
+                    pass  # TODO: go to blackjack
+                elif go_fish_rect.collidepoint(m):
+                    pass  # TODO: go to go fish
+                elif rps_rect.collidepoint(m):
+                    pass  # TODO: go to rps
 
 
-    value_played = []
-    suit_played = []
-    while running: #Is this needed?
-        if len(p1.hand) == 0:
-            a = str(input("YOU LOSE, PLAY AGAIN?(Y/N):")) #These will be replaced by buttons
-            if a == "Y": #Deals out cards and continues the loop
-                war_deck.build()
-                war_deck.shuffle()
-                for i in range(26):
-                    p1.hand.append(war_deck.drawCard())
-                    cpu.hand.append(war_deck.drawCard())
-            elif a == 'N':
-                running = False
-
-        elif len(cpu.hand) == 0:
-            if len(p1.self.hand) == 0:
-                b = str(input("YOU WIN, PLAY AGAIN?(Y/N):")) #These will be replaced by buttons
-                if b == "Y": #Deals out cards and continues the loop
-                    war_deck.build()
-                    war_deck.shuffle()
-                    for i in range(26):
-                        p1.hand.append(war_deck.drawCard())
-                        cpu.hand.append(war_deck.drawCard())
-            elif b == 'N':
-                running = False
-                
-        else: #The actual game loop, everything above checks if somebody has won the game
-            print("You have", len(p1.hand), "cards.")
-            input("Press Enter to play card")
-            print()
-            value_played.append(p1.cardValue()) #Compares values to see who wins
-            value_played.append(cpu.cardValue())
-
-            suit_played.append(p1.cardSuit()) #Adds suits to call image
-            suit_played.append(cpu.cardSuit())
-
-            #p1.showHand()
-            #print()
-            print(value_played)
-            print()
-            # print(len(p1.hand))
-            # print()
-
-            play_deck.addCard(p1) #Adds cards to the "pot"
-            play_deck.addCard(cpu)
-            #Input Code here
-            print("You played", value_played[0])
-            input("Press Enter to continue")
-
-
-
-            
-            if value_played[0] > value_played[1]: #Player One wins the round
-                print("You won this round. Gain 2 Cards")
-                p1.drawDeck(play_deck)
-                p1.drawDeck(play_deck)
-            elif value_played[0] < value_played[1]: #CPU WINS the round
-                print("You lost this round. Lose 2 Cards")
-                cpu.drawDeck(play_deck)
-                cpu.drawDeck(play_deck)
-            elif value_played[0] == value_played[1]: #WAR
-                    print("THIS IS WAR")
-                    print()
-                    for i in range(4): #Write exception if a player does not have enough cards to play, while loop?
-                        value_played.append(p1.cardValue())
-                        value_played.append(cpu.cardValue())
-                        play_deck.addCard(p1)
-                        play_deck.addCard(cpu)
-
-                    print()
-                    print(value_played)
-                    print()
-
-                    if value_played[8] > value_played[9]: #Player One WAR
-                        for i in range(10):
-                            p1.drawDeck(play_deck)
-                        print("You won this round. Gain 10 Cards")
-                    elif value_played[8] < value_played[9]: #CPU WINS WAR
-                        for i in range(10):
-                            cpu.drawDeck(play_deck)
-                        print("You lost this round. Gain 10 Cards")
-            
-            while len(value_played) > 0: #Clears value_played list
-                value_played.pop()
-
-#main_menu()                
-
-            
-
-
-def show_card_image(suit, value): #Use cards suit to select array and then value to point at correct image ---> (value - 2)
-    if suit == "♥":
+def show_card_image(suit,
+                    value):  # Use cards suit to select array and then value to point at correct image ---> (value - 2)
+    if suit == "heart":
         x = value - 2
-        Hearts = [Heart_2, Heart_3, Heart_4, Heart_5, Heart_6, Heart_7, Heart_8, Heart_9, Heart_10, Heart_J, Heart_Q, Heart_K, Heart_A]
+        Hearts = [Heart_2, Heart_3, Heart_4, Heart_5, Heart_6, Heart_7, Heart_8, Heart_9, Heart_10, Heart_J, Heart_Q,
+                  Heart_K, Heart_A]
         return Hearts[x]
-    elif suit == "♣️":
+    elif suit == "club":
         x = value - 2
-        Clubs = [Clubs_2, Clubs_3, Clubs_4, Clubs_5, Clubs_6, Clubs_7, Clubs_8, Clubs_9, Clubs_10, Clubs_J, Clubs_Q, Clubs_K, Clubs_A]
+        Clubs = [Clubs_2, Clubs_3, Clubs_4, Clubs_5, Clubs_6, Clubs_7, Clubs_8, Clubs_9, Clubs_10, Clubs_J, Clubs_Q,
+                 Clubs_K, Clubs_A]
         return Clubs[x]
-    elif suit == "♠️":
+    elif suit == "spade":
         x = value - 2
-        Spades = [Spades_2, Spades_3, Spades_4, Spades_5, Spades_6, Spades_7, Spades_8, Spades_9, Spades_10, Spades_J, Spades_Q, Spades_K, Spades_A]
+        Spades = [Spades_2, Spades_3, Spades_4, Spades_5, Spades_6, Spades_7, Spades_8, Spades_9, Spades_10, Spades_J,
+                  Spades_Q, Spades_K, Spades_A]
         y = Spades[x]
         return y
-    elif suit == "♦️":
+    elif suit == "diamond":
         x = value - 2
-        Diamonds = [Diamonds_2, Diamonds_3, Diamonds_4, Diamonds_5, Diamonds_6, Diamonds_7, Diamonds_8, Diamonds_9, Diamonds_10, Diamonds_J, Diamonds_Q, Diamonds_K, Diamonds_A]
+        Diamonds = [Diamonds_2, Diamonds_3, Diamonds_4, Diamonds_5, Diamonds_6, Diamonds_7, Diamonds_8, Diamonds_9,
+                    Diamonds_10, Diamonds_J, Diamonds_Q, Diamonds_K, Diamonds_A]
         return Diamonds[x]
 
 
-
-war()
-
-    
-        
-
-
-
-
-        
-    
-
-
-
-
-
-
+main_menu()
 
 # def blackjack():
 
@@ -468,7 +826,7 @@ war()
 #     while finish == False:
 #         while h_total < 21 or d_total < 21:
 #             c = card[random(0, 14)] #Need to generate 2 CARDS on startup
-#             s = suit[random(0, 3)] 
+#             s = suit[random(0, 3)]
 #             if c == card[9] or card[10] or card[11] or card[12] or card[13]:
 #                 h_total = h_total + c
 #                 str(c) = c
@@ -494,11 +852,8 @@ war()
 #                                 else:
 #                                     yn = input("Play Again? (Y/N)")
 #                         else:
-                            
 
-                        
 
-                    
 #                     elif choice == "S" or "s":
 #                         if 19 < d_total <= 21:
 #                             print("The dealer has took a stand")
@@ -514,8 +869,6 @@ war()
 #                 print("You have been dealt a" + c + " of ", s + ".")
 #                 print("")
 #                 choice = input("Please enter HIT or STAND")
-    
-
 
 
 # def goFish():
@@ -531,17 +884,15 @@ war()
 #     suit = ["♥", "♠️", "♣️", "♦️"]
 
 
-
-
 # def RPS():
 #     print("Welcome to Rock, Paper, Scissors")
 #     print("")
-    
+
 #     p_score = 0
 #     cpu_score = 0
 #     plays = [Rock, Paper, Scissors]
 #     cpu = ""
-    
+
 #     choice = input("Instructions? (Y/N)")
 #     if choice == "Y":
 #         print("This game is simple. Type 'R' to throw out rock, 'S' to throw out scissors or 'P' to throw you paper")
@@ -555,33 +906,33 @@ war()
 #         cpu = plays[random(0, 2)]
 #         if choice == R:
 #             if cpu == Rock:
-            
+
 #             elif cpu == Paper:
-            
+
 #             elif cpu == Scissors:
-            
+
 #         elif choice == S:
 #             if cpu == Rock:
-            
+
 #             elif cpu == Paper:
-            
+
 #             elif cpu == Scissors:
-            
+
 #         elif choice == P:
 #             if cpu == Rock:
-            
+
 #             elif cpu == Paper:
-            
+
 #             elif cpu == Scissors:
-            
-         
-             
-        
-        
-        
-        
-    
-    
+
+
+
+
+
+
+
+
+
 
 
 
