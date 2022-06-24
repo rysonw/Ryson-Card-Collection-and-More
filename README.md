@@ -8,6 +8,9 @@ The main purpose was to broaden my OOP and python concepts.
 
 Overhauled main game loop and completed "WAR" game and main menu
 
+![PyGame](https://user-images.githubusercontent.com/91065673/175589753-20af562e-6ad4-4104-900d-072f942ada01.gif)
+
+
 "WAR" Gameplay:
 https://user-images.githubusercontent.com/91065673/161761233-f4c96012-1910-450a-85fa-ed60a3ea4a93.mp4
 
