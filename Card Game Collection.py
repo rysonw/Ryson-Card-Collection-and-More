@@ -2,9 +2,10 @@ from multiprocessing.connection import wait
 import random, pygame, os, sys
 from pygame.locals import *
 
+
 # ! ALWAYS define the main variables at the top
 
-WIDTH, HEIGHT = 1000, 1000  # Make constant variables CAPITAL
+WIDTH, HEIGHT = 1200, 800  # Make constant variables CAPITAL
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Ryson's Card Game Collection!")
 pygame.init()
@@ -12,6 +13,8 @@ pygame.init()
 baby_blue = (33, 171, 240)
 click = False
 FPS = 60
+
+coins = 0 # For money system, will be used in to buy card skins
 
 # fonts
 font = pygame.font.SysFont("Sans", 20)
@@ -94,7 +97,9 @@ Diamonds_K = pygame.transform.scale(pygame.image.load("images/diamonds/King of D
 Diamonds_A = pygame.transform.scale(pygame.image.load("images/diamonds/Ace of Diamonds.png"), (100, 150))
 
 
-# classes
+#Classes
+
+#War Classes
 class Card:
     def __init__(self, number, suit, value):
         self.suit = suit
@@ -124,7 +129,7 @@ class emptyDeck:
     def drawCard(self):
         return self.cards.pop()
 
-    # ! added drawDeck to draw whole deck
+    #Added drawDeck to draw whole deck
     def drawDeck(self, deck):
         for card in self.cards:
             deck.append(card)
@@ -171,7 +176,7 @@ class Deck:
         return self.cards.pop()
 
 
-class Player(object):  # Create different types of players for each game
+class war_player(object):  # Create different types of players for each game
     def __init__(self):
         self.hand = []
 
@@ -201,19 +206,13 @@ class Player(object):  # Create different types of players for each game
         for c in self.hand:
             return c.suit
 
-    # def war_play_card(self):
-    #     x = self.hand.pop()
-    #     return x.value
-
-
-# ! added new class for WarGame
 class WarGame:
     def __init__(self, player1, player2):
         self.p1 = player1
         self.p2 = player2
 
-    # ! checking for winner
-    def winner(self, p1, cpu, deck):
+    #Checking for winner
+    def war_winner(self, p1, cpu, deck):
         if len(p1.hand) == 0 and len(deck) == 0:
             return cpu
         elif len(cpu.hand) == 0 and len(deck) == 0:
@@ -221,7 +220,7 @@ class WarGame:
 
         return None
 
-    # ! comparing cards for direction
+    #Comparing cards for direction
     def compare_cards(self, value1, value2):
         if value1 > value2:
             return True
@@ -229,25 +228,112 @@ class WarGame:
             return False
 
         return "war"
+    
+# ----------------------------------------- #
+
+#RPS Classes
+
+class RPSGame:
+    def __init__(self, player1, player2):
+        self.p1 = player1
+        self.p2 = player2
+        self.score = 0
+        self.scoreLimit = 0
+
+    #Checking for winner
+    def rps_winner(self, p1, cpu):
+        if p1.score == self.scoreLimit:
+            return p1
+        elif cpu.score == self.scoreLimit:
+            return cpu
+
+        return None
+
+    def compare_choices(self, p1_choice, cpu_choice, p1_score, cpu_score): # Rock Beats Scissors, Scissors Beats Paper, Paper Beats Rock
+        match p1_choice: #Usage of switch cases
+            case "rock":
+                if cpu_choice == "scissors":
+                    p1_score += 1
+                elif cpu_choice == "paper":
+                    cpu_score += 1
+                else:
+                    pass #Tie
+            case "scissors":
+                if cpu_choice == "paper":
+                    p1_score += 1
+                elif cpu_choice == "rock":
+                    cpu_score += 1
+                else:
+                    pass #Tie
+            case "paper":
+                if cpu_choice == "rock":
+                    p1_score += 1
+                elif cpu_choice == "scissors":
+                    cpu_score += 1
+                else:
+                    pass #Tie
+
+class rps_player(object):  # Create different types of players for each game
+    def __init__(self):
+        self.score = 0
+        self.current_choice = None
+
+    def updateChoice(self, choice): #When player chooses rock, paper or scissors
+        self.current_choice = choice
+    
 
 
-# deck = Deck()
-# deck.build()
-# deck.shuffle()
+def RPS():
+    running = True
+    clock = pygame.time.Clock()
+    p1 = rps_player()
+    cpu = rps_player()
+    rps_game_session = RPSGame(p1, cpu)
+    FPS = 60
+
+    def redraw_initial_rps_window():
+        #Drawing Initial Screen on RPS startup
+
+        WIN.fill("Purple")
+        WIN.blit(WAR, (0, 0)) # Background
+
+        pygame.display.update()
+
+    #def set_rps_score_limit():
+
+    while running:
+        clock.tick(FPS)
+
+        redraw_initial_rps_window()
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        #Winner Check
+        if rps_game_session.rps_winner(p1, cpu, p1.score, cpu.score):
+            if rps_game_session.rps_winner(p1, cpu, p1.score, cpu.score) == p1:
+                winner = "you"
+                rps_restart_menu(winner)
+            else:
+                winner = "cpu"
+                rps_restart_menu(winner)
 
 
-# player = Player()
+        
+        
 
-# player.hand.append(deck.drawCard()) WORKS!!!
-# player.showHand()
 
 
 def war():
     running = True
     clock = pygame.time.Clock()
-    p1 = Player()
-    cpu = Player()
-    game = WarGame(p1, cpu)
+    p1 = war_player()
+    cpu = war_player()
+    war_game_session = WarGame(p1, cpu)
     FPS = 144
 
     war_deck = Deck()  # Main deck
@@ -263,9 +349,7 @@ def war():
     value_played = []
     suit_played = []
 
-    # text, img, coor
-
-    card = green_card
+    # text, img, coordinates
 
     p1_cards_left = main_font.render(str(len(p1.hand)) + " left ", False, BLACK)
     cpu_cards_left = main_font.render(str(len(cpu.hand)) + " left ", False, BLACK)
@@ -291,42 +375,44 @@ def war():
     cpu_war_card_x2, cpu_war_card_y2 = (cpu_deck_rect.x, cpu_deck_rect.y)
     cpu_war_card_x3, cpu_war_card_y3 = (cpu_deck_rect.x, cpu_deck_rect.y)
 
-    # ! animation variables: animations in pygame get messy
+    # ! animation variables: animations in pygame get messy; usage of flags to determine which animation to run
 
     p1_move_card = False
     cpu_move_card = False
     move_back = False
     direction = True
     moving = False
-    finished_war_animation = False
     winner = None
 
     # counters
     wait_time = 0
     wait_time_war = 0
 
-    def redraw_window():
-        # ! drawing the window
+    def redraw_initial_war_window():
+        #Drawing Initial Screen on War Startup
 
-        WIN.fill(BROWN)
+        # bg = pygame.image.load("images/war_background.png") THIS IS SUPER LAGGY FROM SOME REASON
+        # WIN.blit(bg, (0, 0))
 
-        WIN.blit(WAR, (0, 0))
-        WIN.blit(green_deck, (p1_deck_rect.x, p1_deck_rect.y))
-        WIN.blit(green_deck, (cpu_deck_rect.x, cpu_deck_rect.y))
-        WIN.blit(current_card, (p1_card_x, p1_card_y))
-        WIN.blit(current_card2, (cpu_card_x, cpu_card_y))
+        WIN.fill("Dark Green")
 
-        WIN.blit(current_card, (p1_card_x, p1_card_y))
+        WIN.blit(WAR, (0, 0)) # Background
+        WIN.blit(green_deck, (p1_deck_rect.x, p1_deck_rect.y)) # Player 1 Deck
+        WIN.blit(green_deck, (cpu_deck_rect.x, cpu_deck_rect.y))    # CPU Deck
+        WIN.blit(current_card, (p1_card_x, p1_card_y)) # Player 1 Card
+        WIN.blit(current_card2, (cpu_card_x, cpu_card_y)) # CPU Card
+
+        WIN.blit(current_card, (p1_card_x, p1_card_y)) 
         WIN.blit(current_card, (cpu_card_x, cpu_card_y))
 
-        WIN.blit(green_card, (p1_war_card_x, p1_war_card_y))
+        WIN.blit(green_card, (p1_war_card_x, p1_war_card_y)) 
         WIN.blit(green_card, (cpu_war_card_x, cpu_war_card_y))
         WIN.blit(green_card, (p1_war_card_x2, p1_war_card_y2))
         WIN.blit(green_card, (cpu_war_card_x2, cpu_war_card_y2))
         WIN.blit(green_card, (p1_war_card_x3, p1_war_card_y3))
         WIN.blit(green_card, (cpu_war_card_x3, cpu_war_card_y3))
 
-        # ! checking a few things to blit over when animating, socards have been layed on top, coming from top, etc.
+        #Checking a few things to blit over when animating, socards have been layed on top, coming from top, etc.
 
         if direction != "war":
             WIN.blit(current_card, (p1_card_x, p1_card_y))
@@ -342,7 +428,7 @@ def war():
             if direction == "war":
                 WIN.blit(war_text, (WIDTH / 2 - war_text.get_width() / 2, HEIGHT / 2 - war_text.get_height() / 2))
 
-        # ! cards left
+        #Cards Left
 
         WIN.blit(p1_cards_left, (p1_deck_rect.x + p1_deck_rect.width * 1.25,
                                  p1_deck_rect.y + p1_deck_rect.height / 2 - p1_cards_left.get_height() / 2))
@@ -350,22 +436,23 @@ def war():
                                   cpu_deck_rect.y + cpu_deck_rect.height / 2 - cpu_cards_left.get_height() / 2))
 
         pygame.display.update()
+    
 
-    while running:  # Is this needed? #! yes it is, this is the main loop, without it the game wont work
+    while running:  #Main WarGame Loop
         clock.tick(FPS)
 
-        # ! updating the cards left variables
+        #Updates cards left
         p1_cards_left = main_font.render(str(len(p1.hand)) + " left ", False, BLACK)
         cpu_cards_left = main_font.render(str(len(cpu.hand)) + " left ", False, BLACK)
 
-        # ! checking for winner
-        if game.winner(p1, cpu, value_played):
-            if game.winner(p1, cpu, value_played) == p1:
+        #Winner Check
+        if war_game_session.war_winner(p1, cpu, value_played):
+            if war_game_session.war_winner(p1, cpu, value_played) == p1:
                 winner = "you"
-                restart_menu(winner)
+                war_restart_menu(winner)
             else:
                 winner = "cpu"
-                restart_menu(winner)
+                war_restart_menu(winner)
 
         # ! checking for events
         for event in pygame.event.get():
@@ -394,7 +481,7 @@ def war():
                         cpu_move_card = True
 
                         # ! getting direction
-                        direction = game.compare_cards(value_played[0], value_played[1])
+                        direction = war_game_session.compare_cards(value_played[0], value_played[1])
 
         # !
         # ! The animations in pygame can get messy. You can put everything in functions and classes if you want and the main loop of the game will look better
@@ -441,7 +528,7 @@ def war():
                     wait_time_war = 1
 
         # ! moving cards back
-        if move_back:
+        if move_back: # move back is true when wait time is over
             done = True
 
             if direction == True:
@@ -499,10 +586,10 @@ def war():
                 current_card2 = green_card
 
 
-            # ! war
+            #War
             elif direction == "war":
 
-                # ! move 3 cards and append cards to list
+                #Move 3 cards and append cards to list
                 if wait_time_war >= 1 and wait_time_war < FPS / 2:
                     if wait_time_war == 1:
                         play_deck.addCard(p1)
@@ -541,7 +628,7 @@ def war():
                         cpu_war_card_y3 += 9
                         cpu_war_card_x3 += 2.75
 
-                # ! resetting variables ans allowing moving again. Then moving normally again and earning all war cards if won
+                # Resetting variables and allowing moving again. Then moving normally again and earning all war cards if won
                 elif wait_time_war > FPS * 1.5:
                     wait_time_war = 0
                     moving = False
@@ -556,13 +643,13 @@ def war():
                 if wait_time_war >= 1:
                     wait_time_war += 1
 
-        redraw_window()
+        redraw_initial_war_window()
 
         pygame.display.update()
 
 
-# ! restart menu
-def restart_menu(winner):
+#Restart Menu
+def war_restart_menu(winner):
     clock = pygame.time.Clock()
     FPS = 60
     run = True
@@ -581,8 +668,8 @@ def restart_menu(winner):
     back_rect = pygame.Rect(WIDTH / 2 - 125, HEIGHT / 2 + 100, 250, 50)
     restart_rect = pygame.Rect(WIDTH / 2 + 125 + 50, HEIGHT / 2 + 100, 250, 50)
 
-    def redraw_window():
-        # ! drawing
+    def redraw_war_restart_window():
+        #Draws restart menu
 
         WIN.blit(won, (WIDTH / 2 - won.get_width() / 2, HEIGHT / 2 - won.get_height()))
 
@@ -624,7 +711,7 @@ def restart_menu(winner):
                 if restart_rect.collidepoint(m):
                     return war()
 
-        redraw_window()
+        redraw_war_restart_window()
 
 
 def draw_text(text, font, color, surface, x, y):
@@ -770,7 +857,7 @@ def play_menu():
                 elif go_fish_rect.collidepoint(m):
                     pass  # TODO: go to go fish
                 elif rps_rect.collidepoint(m):
-                    pass  # TODO: go to rps
+                    return RPS()
 
 
 def show_card_image(suit,
@@ -883,47 +970,6 @@ main_menu()
 #     card = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace1", "Ace2"]
 #     suit = ["♥", "♠️", "♣️", "♦️"]
 
-
-# def RPS():
-#     print("Welcome to Rock, Paper, Scissors")
-#     print("")
-
-#     p_score = 0
-#     cpu_score = 0
-#     plays = [Rock, Paper, Scissors]
-#     cpu = ""
-
-#     choice = input("Instructions? (Y/N)")
-#     if choice == "Y":
-#         print("This game is simple. Type 'R' to throw out rock, 'S' to throw out scissors or 'P' to throw you paper")
-#         print("")
-#         print("Paper beats Rock, Rock beats Scissors and Scissors beats Paper. You get one point for every match. First to 10 wins!")
-#     elif choice == "N":
-#         return ""
-#     while p_score or cpu_score < 9:
-#         print("The score is " + p_score + " - " + cpu_score)
-#         choice = input("Please enter 'R', 'P', or 'S' to pick your move: ")
-#         cpu = plays[random(0, 2)]
-#         if choice == R:
-#             if cpu == Rock:
-
-#             elif cpu == Paper:
-
-#             elif cpu == Scissors:
-
-#         elif choice == S:
-#             if cpu == Rock:
-
-#             elif cpu == Paper:
-
-#             elif cpu == Scissors:
-
-#         elif choice == P:
-#             if cpu == Rock:
-
-#             elif cpu == Paper:
-
-#             elif cpu == Scissors:
 
 
 
