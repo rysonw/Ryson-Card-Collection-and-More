@@ -99,7 +99,7 @@ Diamonds_A = pygame.transform.scale(pygame.image.load("images/diamonds/Ace of Di
 
 #Classes
 
-#War Classes
+#--------------------War Classes---------------------#
 class Card:
     def __init__(self, number, suit, value):
         self.suit = suit
@@ -229,9 +229,7 @@ class WarGame:
 
         return "war"
     
-# ----------------------------------------- #
-
-#RPS Classes
+#--------------------RPS Classes---------------------#
 
 class RPSGame:
     def __init__(self, player1, player2):
@@ -280,8 +278,10 @@ class rps_player(object):  # Create different types of players for each game
 
     def updateChoice(self, choice): #When player chooses rock, paper or scissors
         self.current_choice = choice
-    
 
+
+
+#--------------------RPS Functions---------------------#
 
 def RPS():
     running = True
@@ -322,11 +322,72 @@ def RPS():
                 winner = "cpu"
                 rps_restart_menu(winner)
 
-
         
+#Rock, Paper, Scissors Restart Menu
+def rps_restart_menu(winner): #FIX THIS
+    clock = pygame.time.Clock()
+    FPS = 60
+    run = True
+
+    if winner == "you":
+        won = main_font_large.render("YOU WON", False, WHITE)
+    else:
+        won = main_font_large.render("YOU LOST", False, WHITE)
+
+    restart = main_font.render("RESTART GAME", False, WHITE)
+    back = main_font.render("MAIN MENU", False, WHITE)
+    leave = main_font.render("QUIT", False, WHITE)
+
+    leave_rect = pygame.Rect(WIDTH / 2 - 125 - 300, HEIGHT / 2 + 100, 250, 50)
+    back_rect = pygame.Rect(WIDTH / 2 - 125, HEIGHT / 2 + 100, 250, 50)
+    restart_rect = pygame.Rect(WIDTH / 2 + 125 + 50, HEIGHT / 2 + 100, 250, 50)
+
+    def redraw_rps_restart_window():
+        #Draws restart menu
+        WIN.blit(won, (WIDTH / 2 - won.get_width() / 2, HEIGHT / 2 - won.get_height()))
+
+        pygame.draw.rect(WIN, (255, 0, 0), leave_rect, 5)
+        pygame.draw.rect(WIN, (120, 0, 0), leave_rect)
+
+        pygame.draw.rect(WIN, (100, 100, 100), back_rect, 5)
+        pygame.draw.rect(WIN, (20, 20, 20), back_rect)
+
+        pygame.draw.rect(WIN, (0, 255, 0), restart_rect, 5)
+        pygame.draw.rect(WIN, (0, 100, 0), restart_rect)
+
+        WIN.blit(leave, (leave_rect.x + leave_rect.width / 2 - leave.get_width() / 2,
+                         leave_rect.y + leave_rect.height / 2 - leave.get_height() / 2))
+        WIN.blit(back, (back_rect.x + back_rect.width / 2 - back.get_width() / 2,
+                        back_rect.y + back_rect.height / 2 - back.get_height() / 2))
+        WIN.blit(restart, (restart_rect.x + restart_rect.width / 2 - restart.get_width() / 2,
+                           restart_rect.y + restart_rect.height / 2 - restart.get_height() / 2))
+
+        pygame.display.update()
+
+    while run:
+        clock.tick(FPS)
+
+        # ! checking for clicking
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == MOUSEBUTTONDOWN:
+                m = pygame.mouse.get_pos()
+
+                if leave_rect.collidepoint(m):
+                    pygame.quit()
+                    sys.exit()
+                if back_rect.collidepoint(m):
+                    main_menu()
+                if restart_rect.collidepoint(m):
+                    return RPS()
+
+        redraw_rps_restart_window()
         
 
-
+#--------------------War Functions---------------------#
 
 def war():
     running = True
@@ -362,7 +423,7 @@ def war():
     current_card = green_card
     current_card2 = green_card
 
-    # ! animation variables for coordinates and card moving animations
+    # Animation variables for coordinates and card moving animations
 
     p1_card_x, p1_card_y = (p1_deck_rect.x, p1_deck_rect.y)
     cpu_card_x, cpu_card_y = (cpu_deck_rect.x, cpu_deck_rect.y)
@@ -375,7 +436,7 @@ def war():
     cpu_war_card_x2, cpu_war_card_y2 = (cpu_deck_rect.x, cpu_deck_rect.y)
     cpu_war_card_x3, cpu_war_card_y3 = (cpu_deck_rect.x, cpu_deck_rect.y)
 
-    # ! animation variables: animations in pygame get messy; usage of flags to determine which animation to run
+    # Animation variables: animations in pygame get messy; usage of flags to determine which animation to run
 
     p1_move_card = False
     cpu_move_card = False
@@ -454,19 +515,19 @@ def war():
                 winner = "cpu"
                 war_restart_menu(winner)
 
-        # ! checking for events
+        #Checking for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == MOUSEBUTTONDOWN:
-                # ! if clicked
+                #If clicked
                 m = pygame.mouse.get_pos()
-                # ! if player clicked on his deck
+                #If player clicked on his deck
                 if p1_deck_rect.collidepoint(m):
-                    # ! if not in animation or winner
+                    #If not in animation or winner
                     if not moving and not winner:
-                        # ! appending values, etc.
+                        #Appending values, etc.
                         moving = True
 
                         value_played.append(p1.cardValue())
@@ -483,12 +544,14 @@ def war():
                         # ! getting direction
                         direction = war_game_session.compare_cards(value_played[0], value_played[1])
 
-        # !
-        # ! The animations in pygame can get messy. You can put everything in functions and classes if you want and the main loop of the game will look better
-        # ! I have not done that because it will get event more confusing because you will have to give many unclear parameters to the functions and then work with them in the classes
-        # !
+        #
+        #The animations in pygame can get messy. You can put everything in functions and classes if you want and the main loop of the game will look better
+        #I have not done that because it will get event more confusing because you will have to give many unclear parameters to the functions and then work with them in the classes
+        #
 
-        # ! starting moving the cards (for animation)
+        #TODO: Create a Animations Class and put all the animations in there. It will be much cleaner
+
+        #Starting moving the cards (for animation)
 
         if p1_move_card:
             if p1_card_y > HEIGHT / 2 - p1_deck_rect.height / 2 or p1_card_x > p1_deck_rect.x - p1_deck_rect.width / 2:
@@ -527,8 +590,8 @@ def war():
                 if direction == "war":
                     wait_time_war = 1
 
-        # ! moving cards back
-        if move_back: # move back is true when wait time is over
+        #Cards to Deck anmimation
+        if move_back: #Move back is true when wait time is over
             done = True
 
             if direction == True:
@@ -546,7 +609,7 @@ def war():
                     done = False
 
                 if done:
-                    # ! when completely moved back, reset variables, allow to move again and append won cards
+                    #When completely moved back, reset variables, allow to move again and append won cards
                     move_back = False
                     moving = False
                     p1_card_x, p1_card_y = (p1_deck_rect.x, p1_deck_rect.y)
@@ -648,7 +711,6 @@ def war():
         pygame.display.update()
 
 
-#Restart Menu
 def war_restart_menu(winner):
     clock = pygame.time.Clock()
     FPS = 60
@@ -720,13 +782,25 @@ def draw_text(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
+#--------------------BlackJack Functions---------------------#
+
+def blackjack():
+    print("Welcome to BlackJack!")
+
+#--------------------Go Fish Functions---------------------#
+
+def go_fish():
+    print("Welcome to GO FISH!")
+
+
+#--------------------Global Functions---------------------#
 
 def main_menu():
     clock = pygame.time.Clock()
     FPS = 60
     run = True
 
-    # ! to calculate the right pos, all the text variables have to be defined normally, not with "draw_text"
+    #All the text variables have to be defined normally, not with "draw_text"
 
     # heading = azonix_large.render("Ryson's Card Game Collection", False, WHITE)
 
@@ -751,7 +825,7 @@ def main_menu():
         WIN.blit(MAIN_MENU, (0, 0))
         # WIN.blit(heading, (WIDTH / 2 - heading.get_width() / 2, 200))
 
-        # ! hover animation
+        #Hover animation; TODO: Reuse for buttons in RPS
         m = pygame.mouse.get_pos()
         if play_rect.collidepoint(m):
             pygame.draw.rect(WIN, (80, 80, 80), play_rect, 2)
@@ -804,7 +878,7 @@ def play_menu():
     go_fish = azonix_large.render("GO FISH", False, WHITE)
     rps = azonix_large.render("RPS", False, WHITE)
 
-    # ! variables that need to be defined for hover animation
+    #Variables that need to be defined for hover animation
 
     war_text_rect = pygame.Rect(WIDTH * 0.25 - war_text.get_width() / 2 - 10, HEIGHT / 2 - 50 - 4,
                                 war_text.get_width() + 20, war_text.get_height())
@@ -820,7 +894,7 @@ def play_menu():
         WIN.blit(heading, (WIDTH / 2 - heading.get_width() / 2, 100))
         WIN.blit(under_heading, (WIDTH / 2 - under_heading.get_width() / 2, 170))
 
-        # ! hover animation
+        #Hover animation
         m = pygame.mouse.get_pos()
         if war_text_rect.collidepoint(m):
             pygame.draw.rect(WIN, (80, 80, 80), war_text_rect, 2)
@@ -860,7 +934,7 @@ def play_menu():
                     return RPS()
 
 
-def show_card_image(suit,
+def show_card_image(suit,    #Used in War, BlackJack and Go Fish
                     value):  # Use cards suit to select array and then value to point at correct image ---> (value - 2)
     if suit == "heart":
         x = value - 2
@@ -887,88 +961,6 @@ def show_card_image(suit,
 
 main_menu()
 
-# def blackjack():
-
-#     print("Welcome to BlackJack!")
-#     print("")
-
-#     Jack, Queen, King = 10
-#     Ace1 = 11
-#     Ace2 = 1
-#     finish = False
-
-#     #card = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
-#     card = [2, 3, 4, 5, 6, 7, 8, 9, 10, Jack, Queen, King, Ace1, Ace2]
-#     suit = ["♥", "♠️", "♣️", "♦️"]
-
-#     hand = []
-#     h_total = 0
-#     dealer = []
-#     d_total = 0
-
-#     card = 0
-#     item = ""
-#     yn = ""
-
-#     while finish == False:
-#         while h_total < 21 or d_total < 21:
-#             c = card[random(0, 14)] #Need to generate 2 CARDS on startup
-#             s = suit[random(0, 3)]
-#             if c == card[9] or card[10] or card[11] or card[12] or card[13]:
-#                 h_total = h_total + c
-#                 str(c) = c
-#                 hand.append(str(c + " of " + s))
-#                 print("You have been dealt a " + hand)
-#                 print("")
-#                 choice = input("Enter H for hit OR S for stand")
-
-#                 while choice != "H" or "h" or "S" or "s":
-#                     if choice == "H" or "h":
-#                         item, card = randomCard(random(0, 14), random(0, 3))
-#                         hand.append(item)
-#                         if h_total > 21:
-#                             print("Your hand is a bust! You LOSE!")
-#                             while yn != 'Y' or 'N':
-#                                 yn = input("Play Again? (Y/N)")
-#                                 if yn == "Y":
-#                                     yn == ""
-#                                     blackjack()
-#                                 elif yn == "N":
-#                                     yn = ""
-#                                     menu()
-#                                 else:
-#                                     yn = input("Play Again? (Y/N)")
-#                         else:
-
-
-#                     elif choice == "S" or "s":
-#                         if 19 < d_total <= 21:
-#                             print("The dealer has took a stand")
-#                             if d_total
-
-
-#                     else:
-#                         choice = input("ERROR. Enter H for hit OR S for stand")
-
-#             else:
-#                 h_total = h_total + c
-#                 hand.append(c + " of " + s)
-#                 print("You have been dealt a" + c + " of ", s + ".")
-#                 print("")
-#                 choice = input("Please enter HIT or STAND")
-
-
-# def goFish():
-#     print("Welcome to GO FISH!")
-
-
-# def war():
-#     print("Welcome to WAR!")
-#     print("")
-#     print("In this game, you will be given 26 random cards")
-
-#     card = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace1", "Ace2"]
-#     suit = ["♥", "♠️", "♣️", "♦️"]
 
 
 
