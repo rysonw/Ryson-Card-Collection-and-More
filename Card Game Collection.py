@@ -97,7 +97,20 @@ Diamonds_K = pygame.transform.scale(pygame.image.load("images/diamonds/King of D
 Diamonds_A = pygame.transform.scale(pygame.image.load("images/diamonds/Ace of Diamonds.png"), (100, 150))
 
 
-#Classes
+#Classes:
+
+#--------------------Animations Classes---------------------#
+class Animation:
+    def __init__(self, x, y, width, height, color, screen):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.screen = screen
+
+    def draw(self):
+        pygame.draw.rect(self.screen, self.color, (self.x, self.y, self.width, self.height))
 
 #--------------------War Classes---------------------#
 class Card:
@@ -290,8 +303,9 @@ def RPS():
     cpu = rps_player()
     rps_game_session = RPSGame(p1, cpu)
     FPS = 60
+    cpu_choices = ["rock", "paper", "scissors"]
 
-    def redraw_initial_rps_window():
+    def redraw_initial_rps_window(): #All static images should be declared and drawn here
         #Drawing Initial Screen on RPS startup
 
         WIN.fill("Purple")
@@ -301,6 +315,8 @@ def RPS():
 
     #def set_rps_score_limit():
 
+    #set_rps_score_limit() #Set score limit before main game loop
+
     while running:
         clock.tick(FPS)
 
@@ -308,14 +324,73 @@ def RPS():
 
         pygame.display.update()
 
+        #Renders (Example) What is Changing?
+        # p1_cards_left = main_font.render(str(len(p1.hand)) + " left ", False, BLACK)
+        # cpu_cards_left = main_font.render(str(len(cpu.hand)) + " left ", False, BLACK)
+
+        p1_score = main_font.render(str(p1.score), False, BLACK)
+        cpu_score = main_font.render(str(cpu.score), False, BLACK)
+
+        rock_button = pygame.Rect(WIDTH / 2 - green_deck.get_width() / 2, HEIGHT - green_deck.get_height() * 1.5,
+                               green_deck.get_width(), green_deck.get_height())
+        paper_button = pygame.Rect(WIDTH / 2 - green_deck.get_width() / 2, green_deck.get_height() * 0.5,
+                                green_deck.get_width(), green_deck.get_height())
+        scissors_button = pygame.Rect(WIDTH / 2 - green_deck.get_width() / 2, green_deck.get_height() * 0.5,
+                                green_deck.get_width(), green_deck.get_height())
+        
+
+
+        #Checking for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
+            cpu.updateChoice(random.choice(cpu_choices)) #Randomly chooses rock, paper or scissors
+
+            if event.type == MOUSEBUTTONDOWN:
+                #If clicked
+                m = pygame.mouse.get_pos()
+                #If player clicked on rock button
+                if rock_button.collidepoint(m):
+                    if not winner:
+                        #Appending values, etc.
+
+                        p1.updateChoice("rock")
+
+                        #Animations go here
+
+                        rps_game_session.compare_choices(p1.current_choice, cpu.current_choice, p1.score, cpu.score)
+
+                        #Update Score
+
+                if paper_button.collidepoint(m):
+                    if not winner:
+                        #Appending values, etc.
+
+                        p1.updateChoice("paper")
+
+                        #Animations go here
+
+                        rps_game_session.compare_choices(p1.current_choice, cpu.current_choice, p1.score, cpu.score)
+
+                        #Update Score
+
+                if scissors_button.collidepoint(m):
+                    if not winner:
+                        #Appending values, etc.
+
+                        p1.updateChoice("scissors")
+
+                        #Animations go here
+
+                        rps_game_session.compare_choices(p1.current_choice, cpu.current_choice, p1.score, cpu.score)
+
+                        #Update Score
+
         #Winner Check
-        if rps_game_session.rps_winner(p1, cpu, p1.score, cpu.score):
-            if rps_game_session.rps_winner(p1, cpu, p1.score, cpu.score) == p1:
+        if rps_game_session.rps_winner(p1, cpu):
+            if rps_game_session.rps_winner(p1, cpu) == p1:
                 winner = "you"
                 rps_restart_menu(winner)
             else:
@@ -323,7 +398,7 @@ def RPS():
                 rps_restart_menu(winner)
 
         
-#Rock, Paper, Scissors Restart Menu
+#Rock, Paper, Scissors Restart Menu Functions
 def rps_restart_menu(winner): #FIX THIS
     clock = pygame.time.Clock()
     FPS = 60
@@ -341,6 +416,8 @@ def rps_restart_menu(winner): #FIX THIS
     leave_rect = pygame.Rect(WIDTH / 2 - 125 - 300, HEIGHT / 2 + 100, 250, 50)
     back_rect = pygame.Rect(WIDTH / 2 - 125, HEIGHT / 2 + 100, 250, 50)
     restart_rect = pygame.Rect(WIDTH / 2 + 125 + 50, HEIGHT / 2 + 100, 250, 50)
+
+    #Animation Variables, Text/Img Coords, 
 
     def redraw_rps_restart_window():
         #Draws restart menu
@@ -364,6 +441,7 @@ def rps_restart_menu(winner): #FIX THIS
 
         pygame.display.update()
 
+    #Restart Menu Loop
     while run:
         clock.tick(FPS)
 
@@ -385,6 +463,8 @@ def rps_restart_menu(winner): #FIX THIS
                     return RPS()
 
         redraw_rps_restart_window()
+
+
         
 
 #--------------------War Functions---------------------#
@@ -805,8 +885,8 @@ def main_menu():
     # heading = azonix_large.render("Ryson's Card Game Collection", False, WHITE)
 
     play = azonix.render("Play", False, WHITE)
-    options = azonix.render("Options", False, WHITE)
-    about = azonix.render("About", False, WHITE)
+    options = azonix.render("Shop", False, WHITE)
+    about = azonix.render("Options", False, WHITE)
     help = azonix.render("Help", False, WHITE)
 
     # ! variables that need to be defined for hover animation
